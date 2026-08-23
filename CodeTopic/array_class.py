@@ -275,14 +275,35 @@ class Solution:
 
         return count
         
+# 1109 航班预定统计
+# 差分数组 
+
+# 暴力求解 超时
+# class Solution:
+#     def corpFlightBookings(self, bookings: List[List[int]], n: int) -> List[int]:
+#         answer=[0] * n
+#         for first, last, seats in bookings: 
+#             for i in range(first-1, last):
+#                 answer[i] += seats
+#         return answer
+
+# 差分数组:
 
 
-
-
-
-
-
-
+class Solution:
+    def corpFlightBookings(self, bookings: List[List[int]], n: int) -> List[int]:
+        diff = [0] * (n+1)
+        for first, last, seats in bookings: 
+            diff[first-1] += seats
+            diff[last] -= seats
+        
+        answer = [0] * n
+        last_seats = 0
+        for i in range(n):
+            answer[i] = last_seats + diff[i]
+            last_seats = answer[i]
+        
+        return answer
 
 
 
