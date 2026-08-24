@@ -305,6 +305,28 @@ class Solution:
         
         return answer
 
+# 56 合并区间
+
+class Solution:
+    def merge(self, intervals: List[List[int]]) -> List[List[int]]:
+        # 先将intervals 排序
+        intervals.sort(key=lambda x: x[0])
+        res = []
+        i = 0
+        cur = intervals[0]
+        while i+1 < len(intervals):
+            next = intervals[i+1]
+            if cur[1] >= next[0]: # 此时重叠
+                cur[1] = max(cur[1], next[1])
+            else: #不重叠
+                res.append(cur)
+                cur = next
+            i += 1
+
+        res.append(cur)
+
+        return res
+
 
 
         
