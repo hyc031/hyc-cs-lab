@@ -328,11 +328,55 @@ class Solution:
         return res
 
 
+# 41 缺失的第一个正数
 
-        
-        
+# 解法1 
+# 会出现超时   O(n**2)
+class Solution:
+    def firstMissingPositive(self, nums: List[int]) -> int:
+        i = 1
+        while True:
+            if i in nums:
+                i += 1
+            else:
+                return i
 
+# 解法2: 
+# 测试通过, 但是申请了 n 额外空间, 并不是常数空间, 不满足题目要求.
+class Solution:
+    def firstMissingPositive(self, nums: List[int]) -> int: 
+        nums_set = set(nums)
+        i = 1
+        while True:
+            if i in nums_set:
+                i += 1
+            else:
+                return i
 
+# 法3  原地哈希
+class Solution:
+    def firstMissingPositive(self, nums: List[int]) -> int: 
+        i = 0
+        while i < len(nums):
+            num = nums[i]
+            if i == num - 1: # 恰好已经归位
+                i = i+1 # 往后面扫
+            else: #没有归位
+                # if 1<=num<=len(nums) and nums(nums[i]-1) != nums[i]: # 此时出现错误
+                if 1 <= num <= len(nums) and nums[num-1] != num:
+                    # 此时没有归位  并且在能归位的区间内(防止数过大过小 产生越位)
+                    tar = nums[num-1]
+                    nums[num-1] = num
+                    nums[i] = tar   # 交换
+                    # nums[num-1], nums[i] = nums[i], nums[num-1] # python 交换位置写法
+                else:# 没有交换资格  往后扫
+                    i = i+1
+        # 全部交换后 寻找值
+        for i in range(len(nums)):
+            if i == nums[i]-1:
+                pass
+            else:
+                return i+1
         
 
 
