@@ -1,4 +1,9 @@
-# Hot 100 中的一些题目
+'''
+力扣上面的一些经典题目
+'''
+###### ****** ######
+# 数组的相关题目
+ 
 # 01 两数之和
 class Solution:
     # 遍历求解
@@ -378,6 +383,44 @@ class Solution:
             else:
                 return i+1
         
+###### ****** ######
+# 列表的相关题目
+
+# 206 反转链表
+
+# Definition for singly-linked list.
+class ListNode:
+    def __init__(self, val=0, next=None):
+        self.val = val
+        self.next = next
+
+class Solution:
+    # 法1 创建了一个新的链表 来进行求解
+    def reverseList(self, head: Optional[ListNode]) -> Optional[ListNode]:
+        
+        # cur = None
+        # while head != None:
+        #     cur = ListNode(head.val, cur)
+        #     head = head.next
+
+        # return cur
+            # 法2 原地反转
+        pre = None
+        while head != None:
+            # 提前记录下一个节点
+            next_node = head.next
+            # 当前节点 的 next指针进行反转
+            head.next = pre
+            # 移动
+            pre = head
+            head = next_node
+        
+        return pre
+
+
+
+    
+
 
 
 
