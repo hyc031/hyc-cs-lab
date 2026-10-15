@@ -1,0 +1,17 @@
+# API 密钥，禁止提交到 git
+.env
+
+# 运行时数据（上传文档、向量库）
+data/uploaded/*
+data/parsed/*
+data/vectorstore/*
+!data/uploaded/.gitkeep
+!data/parsed/.gitkeep
+!data/vectorstore/.gitkeep
+
+__pycache__/
+*.pyc
+.streamlit/secrets.toml
+
+# Office 打开时产生的临时锁文件
+~$*

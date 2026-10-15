@@ -1,0 +1,68 @@
+## 你是一个资深的RAG开发人员，你需要实现一个本地知识库的RAG系统。
+
+## 核心功能：
+1.文档上传 支持 PDF、Word、TXT、Markdown
+2.文档解析 支持自动解析文档内容，提取关键信息
+3.智能问答 支持根据用户问题，从文档中提取相关信息
+4.引用来源 支持引用文档中的具体段落或句子
+5.多轮对话 支持与用户进行多轮对话，根据用户问题，从文档中提取相关信息
+
+## 使用技术：
+1.前端：HTML + CSS + JavaScript 或者 streamlit
+2.后端：FastAPI 或者 streamlit
+3.向量数据库：Numpy,faiss
+4.框架：Langchain
+5.嵌入模型：Qwen/Qwen3-Embedding-4B
+6.对话模型：zai-org/GLM-5.3-Flash
+
+## UI界面设计和逻辑
+1.整体风格：简洁、直观、用户友好
+2.本地知识库界面：点击之后显示分块模式，且显示分块示例
+3.智能问答界面：用户输入问题，系统根据问题判断当前问题是否需要调用知识库，若需要则调用知识库，若不需要则直接回答
+4.引用来源界面：用户点击引用来源，系统显示引用的段落或句子
+5.多轮对话界面：用户可以与系统进行多轮对话，系统根据用户问题从文档中提取相关信息
+
+### 注意事项
+1.开发到核心或者重要的部分的时候，需要给我几个选项，我来选择项目的走向。
+2.我在硅基流动平台调用这些模型，你需要一开始问我qwen3的qwen3-Embedding-4B模型的api key，还有GLM-5.3-Flash模型的api key。
+
+
+### 使用说明，
+#### qwen3-Embedding-4B模型调用
+
+import requests
+
+response = requests.post(
+    "https://api.siliconflow.cn/v1/embeddings",
+    headers={
+        "Authorization": "Bearer $SILICONFLOW_API_KEY",
+        "Content-Type": "application/json"
+    },
+    json={
+        "input": {"image": "https://example.com/image.jpg"},
+        "model": "Qwen/Qwen3-VL-Embedding-8B"
+    }
+)
+print(response.json())
+
+
+#### GLM-5.3-Flash
+
+from openai import OpenAI
+
+client = OpenAI(
+    api_key="YOUR_API_KEY",
+    base_url="https://api.siliconflow.cn/v1"
+)
+
+response = client.chat.completions.create(
+    model="deepseek-ai/DeepSeek-V4-Flash",
+    messages=[
+        {"role": "system", "content": "You are a helpful assistant."},
+        {"role": "user", "content": "Hello, please introduce yourself."}
+    ]
+)
+print(response.choices[0].message.content)
+
+
+

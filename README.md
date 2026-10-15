@@ -1,14 +1,18 @@
-# 📚 学习笔记 · 语音大模型方向
+# 📚 学习笔记与项目 Demo 合集
 
-> 持续更新中 · 最后更新：2026-09-10
+> 持续更新中 · 最后更新：2026-10-15
 
-个人学习笔记仓库，主线为 **语音大模型（Audio/Speech LLM）工程方向**：从 LLM 推理与微调基础，到 Whisper 领域 ASR 微调，再到实时语音对话系统；并行推进 LeetCode 刷题与强化学习基础。
+个人学习笔记与实践仓库，包含三条主线：
+
+- **AudioLLmDemo/** — 语音大模型（Audio/Speech LLM）工程方向：LLM 推理与微调基础 → Whisper 领域 ASR 微调 → 实时语音对话系统
+- **CodeTopic/** — LeetCode 按专题刷题
+- **SelfProjectDemo/** — 个人案例 Demo（skills 编写、RAG 知识库问答等）
 
 ---
 
 ## 📖 简介
 
-本仓库记录「大模型 + 语音」方向的学习与项目实践，内容以个人理解为主，仅供参考。
+本仓库记录学习过程与个人项目实践，内容以个人理解为主，仅供参考。
 
 **记录原则：**
 
@@ -46,13 +50,20 @@
 ├── CodeTopic/             # LeetCode 按专题刷题（数组/双指针/滑动窗口/链表...）
 │   ├── Array&Pointer.md   #   数组 + 双指针题单（按组分类，标注考点）
 │   ├── array_class.py / linked_list.py / DataStructure.ipynb   # 数据结构实现
+│   ├── Test.py            #   前缀和等专题的练习草稿
 │   └── FunctionMethod/    #   语言基础（函数与方法）
-├── RLwork/                # 强化学习基础（DQN 等经典算法实现）🚧 刚起步
-├── SelfProjectDemo/       # 个人工程实践（skills 编写等）
+├── SelfProjectDemo/       # 个人工程实践
+│   ├── skills/            #   自编 skills（含 blog-submit 博客发布流程）
+│   └── other/RAG/         #   🔥 RAG 知识库问答 Demo（Streamlit + FAISS + 硅基流动 API）
+│       ├── app.py         #     主界面（首页/知识库/问答/引用来源）
+│       ├── core/          #     解析 → 分块 → 嵌入 → FAISS → 路由/检索/引用生成 编排
+│       ├── ui/styles.py / tests/e2e_test.py / scripts/   # 样式 / 端到端测试 / 演示文档生成
+│       ├── data/          #     运行时数据（uploaded/parsed/vectorstore 已 gitignore）
+│       └── .env.example   #     API Key 配置模板（真实 .env 不入库）
 └── demo.py                # 本地临时脚本（已 gitignore，不上传）
 ```
 
-> 注：模型权重（`.pth` / `.safetensors` / `.bin`）与数据集目录已在 `.gitignore` 中排除。
+> 注：模型权重（`.pth` / `.safetensors` / `.bin`）、数据集目录与 `RLwork/` 已在 `.gitignore` 中排除；`SelfProjectDemo/other/RAG/.env`（API Key）同样不入库。
 
 ---
 
@@ -91,9 +102,9 @@
 
 按专题推进：数组/双指针 → 滑动窗口 → 二分 → 前缀和/差分 → 区间合并 → 链表/数据结构，见 `CodeTopic/`。
 
-### 并行 · 强化学习基础（9月 –）🔄 刚起步
+### 并行 · 个人案例 Demo ✅ 新增
 
-从经典值函数方法入手，当前在 `RLwork/` 编写 DQN 算法实现，后续计划衔接 RLHF / GRPO 相关内容（可对照 `minimind/trainer/` 中的 PPO / DPO / GRPO 训练代码阅读）。
+`SelfProjectDemo/` 收录自写 skills 与小型工程案例，最新加入的是 **RAG 知识库问答 Demo**（`other/RAG/`）：上传文档 → 解析分块 → FAISS 向量化入库 → 带引用来源的多轮问答（路由判断是否检索 + 查询改写），全栈基于 Streamlit，嵌入与对话模型走硅基流动 API。
 
 ---
 
@@ -110,6 +121,13 @@ pip install transformers datasets evaluate peft trl librosa soundfile scipy tqdm
 python eval_baseline.py                                        # 原版 whisper-medium 基线
 python eval_whisper.py                                         # 默认评估全量微调模型
 python eval_whisper.py outputs/whisper-medium-aishell-lora/final_merged   # 评估 LoRA 合并模型
+
+# RAG 知识库问答 Demo（在 SelfProjectDemo/other/RAG/ 下）
+conda create -n dt python=3.11 -y && conda activate dt
+pip install -r requirements.txt
+cp .env.example .env      # 填入硅基流动 API Key
+streamlit run app.py
+python tests/e2e_test.py  # 无界面端到端自测
 ```
 
 > AISHELL-1 数据需自行下载并按脚本内的本地路径放置；模型权重不随仓库分发。
@@ -120,4 +138,4 @@ python eval_whisper.py outputs/whisper-medium-aishell-lora/final_merged   # 评�
 
 - **项目二收尾**：繁简体归一化 + dev 全量重测 + 错误分析，形成完整项目文档
 - **项目三（旗舰）**：实时语音对话系统 —— 级联链路（流式 ASR + vLLM LLM + 流式 TTS）与 Qwen3-Omni 端到端模型同条件对比压测
-- **强化学习**：DQN → 策略梯度 → RLHF 对齐链路，与 minimind 的 PPO/DPO/GRPO 实现互相印证
+- **RAG Demo 迭代**：接 rerank 重排、多路检索与更细的引用溯源展示，逐步补进 `SelfProjectDemo/other/`
