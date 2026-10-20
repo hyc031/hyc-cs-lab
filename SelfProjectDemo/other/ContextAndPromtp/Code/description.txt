@@ -1,0 +1,4 @@
+刚好 ../ 涉及到了context 内容，将Transformer 的一些列内容串起来。 
+Attention、Muti-Attention(MHA)，--->MQA、GQA、MLA。
+MLA为 Multi-head Latent Attention deepseek V2对于GQA的改进。
+数学原理可以参考(苏剑林博客)：https://kexue.fm/archives/10091

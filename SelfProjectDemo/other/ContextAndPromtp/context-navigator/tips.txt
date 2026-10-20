@@ -1,0 +1,1 @@
+power shell 执行 ython -m uvicorn app.main:app --port 8765 如果端口冲突修改一下端口即可。

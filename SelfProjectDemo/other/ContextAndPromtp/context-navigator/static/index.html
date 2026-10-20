@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Context Pilot · 上下文领航员</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚀</text></svg>">
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+
+  <!-- 顶栏 -->
+  <header class="appbar elevation-2">
+    <div class="brand">
+      <span class="brand-logo">🚀</span>
+      <div class="brand-text">
+        <b>Context Pilot</b>
+        <span>上下文管理演示系统</span>
+      </div>
+    </div>
+    <div class="meter" id="meter">
+      <span class="meter-label">当前 Token: <b id="tokUsed">0</b> / <span id="tokWindow">2048</span></span>
+      <div class="meter-bar"><div id="tokFill" class="meter-fill"></div></div>
+      <span class="meter-pct" id="tokPct">0%</span>
+    </div>
+    <div class="mode-tabs" id="modeTabs">
+      <button class="tab active" data-mode="demo" type="button">演示模式</button>
+      <button class="tab" data-mode="chat" type="button">聊天模式</button>
+    </div>
+    <button class="md-btn text" id="btnSettings" type="button">设置</button>
+  </header>
+
+  <!-- 演示模式引导条 -->
+  <div id="demoBar" class="demo-bar elevation-1 hidden">
+    <span class="phase-chip" id="demoPhase"></span>
+    <div class="demo-text">
+      <b id="demoTitle"></b>
+      <p id="demoNarration"></p>
+    </div>
+    <span class="demo-step" id="demoStep"></span>
+    <button class="md-btn filled" id="btnDemoNext" type="button">下一步 ▸</button>
+    <button class="md-btn text" id="btnDemoReset" type="button">重新开始</button>
+  </div>
+
+  <!-- 主区域 -->
+  <main>
+    <section class="chat-col">
+      <div id="messages" class="messages"></div>
+      <form id="chatForm" class="composer elevation-1" autocomplete="off">
+        <input id="chatInput" placeholder="输入消息，发送给模型…" />
+        <button class="md-btn filled" id="btnSend" type="submit">发送</button>
+      </form>
+    </section>
+
+    <aside class="side-col">
+      <div class="card elevation-1">
+        <div class="card-head" id="ctxHead">
+          <span class="card-title">📊 Context 结构</span>
+          <span class="card-extra" id="ctxTotal"></span>
+        </div>
+        <div id="ctxSections" class="ctx-sections"></div>
+      </div>
+
+      <div class="card elevation-1">
+        <div class="card-head"><span class="card-title">⚡ Cache 状态</span></div>
+        <div class="cache-stats" id="cacheStats"></div>
+      </div>
+
+      <div class="card elevation-1">
+        <div class="card-head"><span class="card-title">📈 Token 趋势</span></div>
+        <div class="trend-wrap"><svg id="trendSvg" viewBox="0 0 300 64" preserveAspectRatio="none"></svg></div>
+      </div>
+    </aside>
+  </main>
+
+  <!-- 底部窗口管理控制台 -->
+  <footer class="console elevation-2">
+    <span class="console-title">窗口管理控制台</span>
+    <span class="chip" id="usageChip">当前窗口: 0%</span>
+    <button class="md-btn tonal" data-strategy="delete" type="button">🗑️ 删除历史</button>
+    <button class="md-btn tonal" data-strategy="summarize" type="button">📝 摘要压缩</button>
+    <button class="md-btn tonal" data-strategy="trim" type="button">🎯 智能裁剪</button>
+    <span class="flex-spacer"></span>
+    <button class="md-btn text" id="btnDetails" type="button">查看裁剪详情</button>
+    <button class="md-btn text" id="btnEditSystem" type="button">编辑 System</button>
+    <button class="md-btn text danger" id="btnReset" type="button">重置会话</button>
+  </footer>
+
+  <!-- 策略选择模态框 -->
+  <div class="modal-backdrop hidden" id="strategyModal">
+    <div class="modal elevation-4">
+      <h3>⚠️ 上下文窗口已满！请选择处理策略：</h3>
+      <p class="modal-sub">三种策略对信息保留程度不同，可依次尝试并对比右侧面板变化。</p>
+      <div class="strategy-options">
+        <button class="strategy-opt" data-strategy="delete" type="button">
+          <b>🗑️ 删除历史</b><span>立刻释放 Token，被删信息彻底丢失</span>
+        </button>
+        <button class="strategy-opt" data-strategy="summarize" type="button">
+          <b>📝 摘要压缩</b><span>保留对话意图与关键事实，丢失细节</span>
+        </button>
+        <button class="strategy-opt" data-strategy="trim" type="button">
+          <b>🎯 智能裁剪</b><span>按相关度打分裁剪，最精准但计算开销大</span>
+        </button>
+      </div>
+      <div class="modal-actions">
+        <button class="md-btn text" id="btnDismissStrategy" type="button">暂不处理</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 裁剪/策略详情模态框 -->
+  <div class="modal-backdrop hidden" id="detailsModal">
+    <div class="modal wide elevation-4">
+      <h3 id="detailsTitle">策略执行详情</h3>
+      <div id="detailsBody" class="details-body"></div>
+      <div class="modal-actions">
+        <button class="md-btn filled" id="btnCloseDetails" type="button">关闭</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- System 编辑模态框 -->
+  <div class="modal-backdrop hidden" id="systemModal">
+    <div class="modal elevation-4">
+      <h3>编辑 System Prompt</h3>
+      <p class="modal-sub">修改后前缀缓存失效，下一轮将 Cache Miss。</p>
+      <textarea id="systemInput" rows="6"></textarea>
+      <div class="modal-actions">
+        <button class="md-btn text" id="btnCancelSystem" type="button">取消</button>
+        <button class="md-btn filled" id="btnSaveSystem" type="button">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 设置抽屉 -->
+  <div class="drawer-backdrop hidden" id="settingsDrawer">
+    <div class="drawer elevation-4">
+      <div class="drawer-head">
+        <h3>设置</h3>
+        <button class="md-btn text" id="btnCloseSettings" type="button">关闭</button>
+      </div>
+      <div class="drawer-body">
+
+        <div class="card elevation-1">
+          <div class="card-head"><span class="card-title">大模型（Chat）</span></div>
+          <label class="field"><span>Base URL</span><input id="setLlmUrl" /></label>
+          <label class="field"><span>API Key</span><input id="setLlmKey" type="password" /></label>
+          <label class="field"><span>模型名称</span><input id="setLlmModel" list="modelList" /></label>
+          <datalist id="modelList"></datalist>
+          <label class="field small"><span>Temperature</span><input id="setLlmTemp" type="number" step="0.1" min="0" max="2" /></label>
+          <div class="field-actions">
+            <button class="md-btn tonal" id="btnTestLlm" type="button">测试连接</button>
+            <button class="md-btn text" id="btnModels" type="button">获取模型列表</button>
+            <span class="test-result" id="testLlmResult"></span>
+          </div>
+        </div>
+
+        <div class="card elevation-1">
+          <div class="card-head"><span class="card-title">Embedding 模型</span></div>
+          <label class="field"><span>Base URL</span><input id="setEmbUrl" /></label>
+          <label class="field"><span>API Key</span><input id="setEmbKey" type="password" /></label>
+          <label class="field"><span>模型名称</span><input id="setEmbModel" /></label>
+          <div class="field-actions">
+            <button class="md-btn tonal" id="btnTestEmb" type="button">测试连接</button>
+            <span class="test-result" id="testEmbResult"></span>
+          </div>
+        </div>
+
+        <div class="card elevation-1">
+          <div class="card-head"><span class="card-title">MCP 服务</span></div>
+          <label class="field checkbox"><input id="setMcpEnabled" type="checkbox" /><span>启用 MCP 工具调用</span></label>
+          <label class="field"><span>服务地址（SSE）</span><input id="setMcpUrl" /></label>
+          <label class="field"><span>API Key（可选）</span><input id="setMcpKey" type="password" /></label>
+          <div class="field-actions">
+            <button class="md-btn tonal" id="btnTestMcp" type="button">测试连接</button>
+            <span class="test-result" id="testMcpResult"></span>
+          </div>
+        </div>
+
+        <div class="card elevation-1">
+          <div class="card-head"><span class="card-title">RAG 与窗口</span></div>
+          <label class="field checkbox"><input id="setRagEnabled" type="checkbox" /><span>启用 RAG 知识库检索</span></label>
+          <label class="field small"><span>检索条数 top_k</span><input id="setRagTopK" type="number" min="1" max="10" /></label>
+          <label class="field small"><span>上下文窗口大小</span><input id="setWindow" type="number" min="256" step="256" /></label>
+          <div class="field-actions">
+            <button class="md-btn tonal" id="btnRebuildKb" type="button">重建知识库索引</button>
+            <span class="test-result" id="kbInfo"></span>
+          </div>
+        </div>
+
+      </div>
+      <div class="drawer-foot">
+        <button class="md-btn filled" id="btnSaveSettings" type="button">保存设置</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast elevation-3 hidden"></div>
+
+  <script src="/static/js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+# 核心依赖（演示模式 + 基础聊天必需）
+fastapi>=0.110
+uvicorn[standard]>=0.29
+openai>=1.30
+requests>=2.31
+
+# RAG 知识库（LangChain + FAISS）。未安装时自动降级为本地关键词检索
+langchain-community>=0.2
+faiss-cpu>=1.7.4
+
+# MCP 客户端（高德地图 SSE）。未安装时工具调用不可用，其余功能不受影响
+mcp>=1.0
