@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI 智行助手 · 端云协同智能出行</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="stylesheet" href="/static/css/style.css" />
+</head>
+<body>
+  <!-- 背景装饰光晕 -->
+  <div class="bg-decor" aria-hidden="true">
+    <div class="glow glow-a"></div>
+    <div class="glow glow-b"></div>
+    <div class="glow glow-c"></div>
+    <div class="noise"></div>
+  </div>
+
+  <div class="app-shell">
+    <!-- 顶部品牌栏 -->
+    <header class="brand-header">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">智</div>
+        <div class="brand-text">
+          <h1 class="brand-title">AI 智行助手</h1>
+          <p class="brand-sub">端云协同 · 智能出行</p>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <div class="mode-switch" role="tablist" aria-label="模式切换">
+          <button class="mode-btn is-active" data-mode="travel" role="tab" aria-selected="true">
+            <span class="mode-ico">🧭</span> 旅游模式
+          </button>
+          <button class="mode-btn" data-mode="chat" role="tab" aria-selected="false">
+            <span class="mode-ico">💬</span> 日常聊天
+          </button>
+          <span class="mode-thumb" aria-hidden="true"></span>
+        </div>
+        <button id="btnSettings" class="icon-btn" title="配置" aria-label="打开配置面板">⚙️</button>
+      </div>
+    </header>
+
+    <main class="app-main">
+      <!-- ============ 旅游模式 ============ -->
+      <section id="view-travel" class="view is-active">
+        <div class="travel-layout">
+          <!-- 左侧表单卡片 -->
+          <div class="card form-card">
+            <div class="card-head">
+              <h2 class="card-title">定制你的行程</h2>
+              <p class="card-desc">填写出行信息，AI 结合高德实时数据为你规划</p>
+            </div>
+
+            <div class="form-grid">
+              <div class="field">
+                <label for="fOrigin">出发地</label>
+                <input id="fOrigin" type="text" placeholder="如：北京·中关村" autocomplete="off" />
+              </div>
+              <div class="field">
+                <label for="fDest">目的地</label>
+                <input id="fDest" type="text" placeholder="如：上海·陆家嘴" autocomplete="off" />
+              </div>
+              <div class="field">
+                <label for="fDays">旅游天数</label>
+                <input id="fDays" type="number" min="1" max="30" value="2" />
+              </div>
+              <div class="field">
+                <label for="fPeople">人数</label>
+                <input id="fPeople" type="number" min="1" max="50" value="2" />
+              </div>
+              <div class="field field-full">
+                <label for="fTransport">出行方式</label>
+                <select id="fTransport">
+                  <option value="新能源自驾">新能源自驾</option>
+                  <option value="驾车">驾车</option>
+                  <option value="公共交通">公共交通</option>
+                  <option value="步行骑行">步行骑行</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="field field-full">
+              <label>兴趣偏好 <span class="hint">（可多选）</span></label>
+              <div id="interestChips" class="chip-group">
+                <button type="button" class="chip" data-value="人文历史">人文历史</button>
+                <button type="button" class="chip" data-value="美食体验">美食体验</button>
+                <button type="button" class="chip" data-value="自然风光">自然风光</button>
+                <button type="button" class="chip" data-value="现代都市">现代都市</button>
+                <button type="button" class="chip" data-value="休闲度假">休闲度假</button>
+                <button type="button" class="chip" data-value="文艺体验">文艺体验</button>
+              </div>
+            </div>
+
+            <div class="field field-full">
+              <label for="fExtra">额外需求</label>
+              <textarea id="fExtra" rows="3" placeholder="如：需要中途充电、优先高速、避开拥堵、沿途特色餐饮"></textarea>
+            </div>
+
+            <button id="btnGeneratePlan" class="btn btn-primary btn-block">
+              <span class="btn-label">生成行程计划</span>
+              <span class="spinner" aria-hidden="true"></span>
+            </button>
+          </div>
+
+          <!-- 右侧结果卡片 -->
+          <div class="card result-card">
+            <div class="card-head result-head">
+              <div>
+                <h2 class="card-title">行程计划</h2>
+                <p class="card-desc">AI 生成的 Markdown 行程将在此实时呈现</p>
+              </div>
+              <div class="result-actions">
+                <button id="btnCopyMd" class="btn btn-ghost btn-sm" disabled>复制 Markdown</button>
+                <button id="btnDownloadMd" class="btn btn-ghost btn-sm" disabled>下载 .md</button>
+              </div>
+            </div>
+
+            <div id="toolIndicator" class="tool-indicator" hidden>
+              <span class="pulse-dot"></span>
+              <span id="toolIndicatorText">正在查询…</span>
+            </div>
+
+            <div id="planEmpty" class="empty-state">
+              <div class="empty-ico">🗺️</div>
+              <p class="empty-title">还没有行程</p>
+              <p class="empty-desc">填写左侧信息并点击「生成行程计划」，为你打造专属出行方案</p>
+            </div>
+
+            <article id="planOutput" class="markdown-body" hidden></article>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ 日常聊天模式 ============ -->
+      <section id="view-chat" class="view">
+        <div class="card chat-card">
+          <div class="chat-head">
+            <h2 class="card-title">日常聊天</h2>
+            <p class="card-desc">向 AI 提问，它会自动调用高德 MCP 工具并展示查询结果</p>
+          </div>
+
+          <div id="chatList" class="chat-list">
+            <div id="chatEmpty" class="empty-state chat-empty">
+              <div class="empty-ico">💬</div>
+              <p class="empty-title">开始对话吧</p>
+              <p class="empty-desc">试试问「深圳今天天气怎么样？」或「从南山到福田怎么走最快？」</p>
+            </div>
+          </div>
+
+          <div class="chat-input-bar">
+            <textarea id="chatInput" rows="1" placeholder="输入消息，Enter 发送 / Shift+Enter 换行"></textarea>
+            <button id="btnSend" class="btn btn-primary btn-send">
+              <span class="btn-label">发送</span>
+              <span class="spinner" aria-hidden="true"></span>
+            </button>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- ============ 配置面板 ============ -->
+  <div id="configOverlay" class="overlay" hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="configTitle">
+      <div class="modal-head">
+        <h2 id="configTitle" class="modal-title">配置</h2>
+        <button id="btnCloseConfig" class="icon-btn" aria-label="关闭">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="config-section">
+          <div class="config-section-head">
+            <h3>大语言模型 (LLM)</h3>
+            <span id="pillLlm" class="pill pill-idle">未测试</span>
+          </div>
+          <div class="field">
+            <label for="cfgLlmBase">Base URL</label>
+            <input id="cfgLlmBase" type="text" placeholder="https://api.openai.com/v1" autocomplete="off" />
+          </div>
+          <div class="field">
+            <label for="cfgLlmKey">API Key</label>
+            <input id="cfgLlmKey" type="password" placeholder="sk-..." autocomplete="off" />
+          </div>
+          <div class="field">
+            <label for="cfgLlmModel">Model</label>
+            <input id="cfgLlmModel" type="text" placeholder="gpt-4o" autocomplete="off" />
+          </div>
+          <button id="btnTestLlm" class="btn btn-ghost btn-sm">
+            <span class="btn-label">连接测试</span>
+            <span class="spinner" aria-hidden="true"></span>
+          </button>
+        </div>
+
+        <div class="config-section">
+          <div class="config-section-head">
+            <h3>高德地图 (MCP)</h3>
+            <span id="pillAmap" class="pill pill-idle">未测试</span>
+          </div>
+          <div class="field">
+            <label for="cfgAmapUrl">SSE 服务 URL</label>
+            <input id="cfgAmapUrl" type="text" placeholder="https://mcp.amap.com/sse" autocomplete="off" />
+          </div>
+          <div class="field">
+            <label for="cfgAmapKey">API Key <span class="hint">（必需）</span></label>
+            <input id="cfgAmapKey" type="password" placeholder="高德 key" autocomplete="off" />
+          </div>
+          <button id="btnTestAmap" class="btn btn-ghost btn-sm">
+            <span class="btn-label">连接测试</span>
+            <span class="spinner" aria-hidden="true"></span>
+          </button>
+        </div>
+      </div>
+
+      <div class="modal-foot">
+        <span id="configMsg" class="config-msg"></span>
+        <button id="btnSaveConfig" class="btn btn-primary">
+          <span class="btn-label">保存配置</span>
+          <span class="spinner" aria-hidden="true"></span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="toast" hidden></div>
+
+  <script src="/static/js/markdown.js"></script>
+  <script src="/static/js/api.js"></script>
+  <script src="/static/js/config.js"></script>
+  <script src="/static/js/travel.js"></script>
+  <script src="/static/js/chat.js"></script>
+  <script src="/static/js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,11 @@
+{
+  "llm": {
+    "base_url": "",
+    "api_key": "",
+    "model": ""
+  },
+  "amap": {
+    "sse_url": "",
+    "api_key": ""
+  }
+}

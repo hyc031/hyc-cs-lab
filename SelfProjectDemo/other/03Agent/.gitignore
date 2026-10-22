@@ -1,0 +1,19 @@
+# Local credentials and runtime files
+/config.json
+/config.json.tmp
+.env
+.env.*
+!.env.example
+
+# Python caches and virtual environments
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Local editor settings and authoring notes
+.vscode/
+.idea/
+*.[mM][dD]
+*.markdown
+/tips.txt
